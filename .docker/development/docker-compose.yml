@@ -1,49 +1,29 @@
-version: '3.8'
-
-name: "mw_backend"
-
-services:
-  # required services
-  postgres:
-    image: postgres
-    ports:
-     - '5432:5432'
-    environment:
-      POSTGRES_PASSWORD: postgres
-    volumes:
-     - 'postgres_data:/var/lib/postgresql/data'
-  redis:
-    image: redis
-
-  # custom services
-  backend:
-    stdin_open: true
-    tty: true
-    build:
-      dockerfile: ./dev.Dockerfile
-      context: ../../
-    volumes:
-      - '../../:/app'
-    env_file:
-      - './config.env'
-    ports:
-      - '8081:8080'
-    depends_on:
-      - postgres
-    environment:
-      - WAIT_HOSTS=postgres:5432
-
-  # util services
-  pgweb:
-    image: sosedoff/pgweb
-    ports: 
-      - "8082:8081"
-    links: 
-      - postgres:postgres
-    environment:
-      - PGWEB_DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
-    depends_on:
-      - postgres
-
-volumes:
-  postgres_data:
+  version: '3.8'
+  services:
+    postgres:
+      image: postgres
+      environment:
+        POSTGRES_USER: koyeb-adm 
+        POSTGRES_DB: koyebdb 
+        POSTGRES_PASSWORD: Qd3JfVTIu6rY 
+      ports:
+        - "5432:5432" 
+      networks:
+        - sudo-flix-network
+    sudo-flix:
+      image: ghcr.io/sussy-code/backend:latest
+      environment:
+        MWB_POSTGRES__CONNECTION: postgres://koyeb-adm:Qd3JfVTIu6rY@ep-broad-recipe-a23mlasx.eu-central-1.pg.koyeb.app/koyebdb
+        MWB_CRYPTO__SESSION_SECRET: yHf3V8s9P2aL1E4n5tG7iKc6RbD0o
+        MWB_META__NAME: unofficial-sudo-flix 
+        MWB_POSTGRES__MIGRATE_ON_BOOT: "true"
+        MIKRO_ORM_MIGRATIONS_DISABLE_FOREIGN_KEYS: "true" 
+      ports:
+        - "80:80"
+      depends_on:
+        - postgres
+      networks:
+        - sudo-flix-network
+  networks:
+    sudo-flix-network: 
+      driver: bridge
