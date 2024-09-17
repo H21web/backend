@@ -1,0 +1,29 @@
+  version: '3.8'
+  services:
+    postgres:
+      image: postgres
+      environment:
+        POSTGRES_USER: koyeb-adm 
+        POSTGRES_DB: koyebdb 
+        POSTGRES_PASSWORD: Qd3JfVTIu6rY 
+      ports:
+        - "5432:5432" 
+      networks:
+        - sudo-flix-network
+    sudo-flix:
+      image: ghcr.io/sussy-code/backend:latest
+      environment:
+        MWB_POSTGRES__CONNECTION: postgres://koyeb-adm:Qd3JfVTIu6rY@ep-broad-recipe-a23mlasx.eu-central-1.pg.koyeb.app/koyebdb
+        MWB_CRYPTO__SESSION_SECRET: yHf3V8s9P2aL1E4n5tG7iKc6RbD0o
+        MWB_META__NAME: unofficial-sudo-flix 
+        MWB_POSTGRES__MIGRATE_ON_BOOT: "true"
+        MIKRO_ORM_MIGRATIONS_DISABLE_FOREIGN_KEYS: "true" 
+      ports:
+        - "80:80"
+      depends_on:
+        - postgres
+      networks:
+        - sudo-flix-network
+  networks:
+    sudo-flix-network: 
+      driver: bridge
